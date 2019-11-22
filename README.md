@@ -7,9 +7,3 @@ npm install
 npm install pm2 -g
 pm2 start .\bin\www2 --watch
 ```
-
-# Новое
-
-```
-npm install sqlite3
-```
