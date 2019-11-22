@@ -1,14 +1,21 @@
 const express = require('express');
 const router = express.Router();
-const controller = require("../controllers/todo.controller");
 
-global.TODOS = [];
+module.exports.init = async function () {
+    const TodoSqliteDataSource = require('../datasources/todo.sqlite.datasource');
+    const TodoRepository = require('../repositories/todo.repository');
+    const TodoController = require("../controllers/todo.controller");
 
-router.route('/')
-.get(controller.getAllTodos)
-.post(controller.createTodo);
+    let todoSqliteDataSource = await new TodoSqliteDataSource();
+    let todoRepository = new TodoRepository(todoSqliteDataSource);
+    let todoController = new TodoController(todoRepository);
 
-router.route('/delete/:id')
-.post(controller.removeTodo);
+    router.route('/')
+        .get(todoController.getAllTodos)
+        .post(todoController.createTodo);
 
-module.exports = router;
+    router.route('/delete/:id')
+        .post(todoController.removeTodo);
+
+    return router;
+}

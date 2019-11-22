@@ -1,15 +1,30 @@
-global.TODOS = [];
+const TodoModel = require('../models/todo.model');
 
-module.exports.getAllTodos = async (req, res) => {
-    return res.send(TODOS);
-};
+class TodoController {
+    constructor(repository) {
+        this.repository = repository;
+    }
 
-module.exports.createTodo = async (req, res) => {
-    TODOS.push({ name: req.body.name, done: false });
-    return res.send({ status: 'ok' });
-};
+    getAllTodos = async (req, res) => {
+        let todos = (await this.repository.getAllTodos()).map(todo => { return { 'id': todo.id, 'name': todo.name, 'is_compleated': todo.isCompleated }; });
+        return res.send(todos);
+    };
 
-module.exports.removeTodo = async (req, res) => {
-    TODOS.splice(req.id, 1);
-    return res.send({ status: 'ok' });
-};
+    createTodo = async (req, res) => {
+        let newTodo = new TodoModel(-1, req.body.name, false);
+
+        await this.repository.addTodo(newTodo);
+
+        return res.send({ status: 'ok' });
+    };
+
+    removeTodo = async (req, res) => {
+        console.log(req.params);
+        
+        await this.repository.removeTodo(req.params.id);
+
+        return res.send({ status: 'ok' });
+    };
+}
+
+module.exports = TodoController;
